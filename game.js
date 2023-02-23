@@ -10,7 +10,7 @@ let gameOptions = {
 var config = {
     type: Phaser.AUTO,
     backgroundColor: 0x540b0e,
-    scene: [Scene1, Scene2, Scene3],
+    scene: [Scene1, Scene2],
     pixelArt: true,
     physics: {
         default: "arcade",
