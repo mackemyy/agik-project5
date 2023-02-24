@@ -2,70 +2,22 @@ const HORIZONTAL = 1;
 const VERTICAL = 2;
 var score = 0;
 var scoreText;
+var numOfSeasonMatched = 0;
 
-class Scene2 extends Phaser.Scene{
+
+class GameProperScene extends Phaser.Scene {
     constructor() {
-        super("playGame");
+        super("gameProper")
     }
-    
+
     preload() {
-    
-        this.load.image("spring", "assets/bg/spring.png");
-        this.load.image("fall", "assets/bg/fall.png");
-        this.load.image("summer", "assets/bg/summer.png");
-        this.load.image("winter", "assets/bg/winter.png");
         this.load.spritesheet("seasons", "assets/sprites/SEASONS_3.png", {
             frameWidth: gameOptions.seasonSize,
             frameHeight: gameOptions.seasonSize,
         });
-        this.load.audio("winter", "assets/music/winter.mp3");
-        this.load.audio("ocean-waves", "assets/music/ocean-waves.mp3");
-        this.load.audio("autumn", "assets/music/autumn.mp3");
-        this.load.audio("spring", "assets/music/spring.mp3");
     }
-    
+
     create() {
-        var randomNum = Phaser.Math.Between(0,3);
-        var camWidth = this.cameras.main.width/2;
-        var camHeight =  this.cameras.main.height/2;
-        var musicConfig = {
-            mute: false,
-            volume: 1,
-            rate: 1,
-            detune: 0,
-            seek: 0,
-            loop: true,
-            delay: 0,
-        }
-        if (randomNum === 0) {
-            this.bg = this.add.image(camWidth, camHeight, "winter");
-            this.music1 = this.sound.add("winter");
-            this.music1.play(musicConfig);
-        }
-        else if(randomNum === 1) {
-            this.bg = this.add.image(camWidth, camHeight, "spring");
-            this.music2 = this.sound.add("spring");
-            this.music2.play(musicConfig);
-        }
-        else if(randomNum === 2) {
-            this.bg = this.add.image(camWidth, camHeight, "summer");
-            this.music3 = this.sound.add("ocean-waves");
-            this.music3.play(musicConfig);
-        }
-        else if(randomNum === 3) {
-            this.bg = this.add.image(camWidth, camHeight, "fall");
-            this.music4 = this.sound.add("autumn");
-            this.music4.play(musicConfig);
-
-        } 
-        let scaleX = this.cameras.main.width / this.bg.width;
-        let scaleY = this.cameras.main.height / this.bg.height;
-        let scale = Math.max(scaleX, scaleY);
-        this.bg.setScale(scale).setScrollFactor(0);
-        const { width, height } = this.scale;
-        const x = width * 0.5; 
-        const y = height * 0.7;
-
         this.canPick = true;
         this.dragging = false;
         this.drawField();
@@ -76,8 +28,9 @@ class Scene2 extends Phaser.Scene{
         scoreText = this.add.text(1200, 500, 'Score: 0', {
             fontSize: '100px', fill: '#fff', fontFamily: '"Poppins"', 
         });
+        this.gameOverText = this.add.text(1000, 450, 'GAME OVER', { font: "100px monospace"});
+        this.gameOverText.visible = false;
     }
-
     drawField() {
         this.gameArray = [];
         this.poolArray = [];
@@ -99,7 +52,6 @@ class Scene2 extends Phaser.Scene{
             }
         }
     }
-
     isMatch(row, col) {
         return this.isHorizontalMatch(row, col) || this.isVerticalMatch(row, col);
     }
@@ -246,6 +198,19 @@ class Scene2 extends Phaser.Scene{
         }
         return false;
     }
+    handleScore() {
+        // if(numOfSeasonMatched === 3) {
+        //     console.log("para 4")
+        //     console.log(numOfSeasonMatched);
+        //     score += 3;
+        // } else if(numOfSeasonMatched === 2) {
+        //     console.log("para 3")
+        //     console.log(numOfSeasonMatched);
+        //     score += 2;
+        // }
+        score+= 10;
+        scoreText.setText('Score: ' + score);
+    }
     handleMatches(){
         this.removeMap = [];
         for(let i = 0; i < gameOptions.fieldSize; i ++){
@@ -254,8 +219,7 @@ class Scene2 extends Phaser.Scene{
                 this.removeMap[i].push(0);
             }
         }
-        score += 10;
-        scoreText.setText('Score: ' + score);
+        this.handleScore();
         this.markMatches(HORIZONTAL);
         this.markMatches(VERTICAL);
         this.destroySeasons();
@@ -276,7 +240,19 @@ class Scene2 extends Phaser.Scene{
                     seasonIconStreak++;
                 }
                 if(seasonIconToWatch != currentSeasonIcon || j == gameOptions.fieldSize - 1){
-                    if(seasonIconStreak >= 3){
+                    if(seasonIconStreak === 3){
+                        numOfSeasonMatched = 2;
+                        for(let k = 0; k < seasonIconStreak; k ++){
+                            if(direction == HORIZONTAL){
+                                this.removeMap[i][startStreak + k] ++;
+                            }
+                            else{
+                                this.removeMap[startStreak + k][i] ++;
+                            }
+                        }
+                    }
+                    else if(seasonIconStreak >= 4){
+                        numOfSeasonMatched = 3;
                         for(let k = 0; k < seasonIconStreak; k ++){
                             if(direction == HORIZONTAL){
                                 this.removeMap[i][startStreak + k] ++;

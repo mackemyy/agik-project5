@@ -1,6 +1,6 @@
 const LightBlue = 0x7EFFE0
 
-class Scene1 extends Phaser.Scene {
+class LoadingScene extends Phaser.Scene {
     constructor() {
         super("startGame");
     }
