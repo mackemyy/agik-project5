@@ -7,10 +7,20 @@ let gameOptions = {
     destroySpeed: 100,
 }
 
+let musicConfig = {
+    mute: false,
+    volume: 1,
+    rate: 1,
+    detune: 0,
+    seek: 0,
+    loop: true,
+    delay: 0,
+}
+
 var config = {
     type: Phaser.AUTO,
     backgroundColor: 0x540b0e,
-    scene: [Scene1, Scene2],
+    scene: [LoadingScene, LoadScenes, DisplayBgScene, GameProperScene, TimerScene, ],
     pixelArt: true,
     physics: {
         default: "arcade",
